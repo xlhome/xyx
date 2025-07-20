@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夏誉馨成长卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF9E58',
+                        'primary-light': '#FFD1B3',
+                        secondary: '#FF6B8B',
+                        accent: '#FFD166',
+                        background: '#FFF9F0',
+                        'card-bg': '#FFFFFF',
+                        text: '#5A3E36',
+                        success: '#7BC950',
+                        shadow: 'rgba(255, 158, 88, 0.2)',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .gradient-primary {
+                background: linear-gradient(90deg, var(--tw-gradient-stops));
+            }
+            .card-hover {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px var(--tw-shadow-color);
+            }
+            .progress-animation {
+                transition: width 1s ease;
+            }
+            .btn-animation {
+                transition: all 0.2s ease;
+            }
+            .btn-animation:hover {
+                transform: translateY(-2px);
+            }
+            .btn-animation:active {
+                transform: translateY(1px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-background to-[#FFF5E6] text-text min-h-screen font-inter p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- 头部区域 -->
+        <header class="relative bg-gradient-to-r from-primary to-secondary rounded-2xl text-white p-6 mb-6 shadow-lg overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10">
+                <div class="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-white"></div>
+                <div class="absolute top-1/2 -right-20 w-60 h-60 rounded-full bg-white"></div>
+                <div class="absolute -bottom-10 left-1/4 w-32 h-32 rounded-full bg-white"></div>
+            </div>
+            <div class="relative z-10">
+                <div class="text-center mb-4">
+                    <i class="fa fa-seedling text-4xl"></i>
+                </div>
+                <h1 class="text-[clamp(1.8rem,5vw,2.5rem)] font-bold tracking-wider text-center mb-2">夏誉馨成长卡</h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white/20 backdrop-blur-sm rounded-xl p-4">
+                    <div class="text-center">
+                        <p class="text-sm opacity-80">今天是</p>
+                        <p id="current-date" class="font-semibold mt-1">2025年7月20日 星期日</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm opacity-80">假期剩余</p>
+                        <p id="vacation-days" class="font-semibold mt-1">42天</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm opacity-80">中考倒计时</p>
+                        <p id="exam-days" class="font-semibold mt-1">679天</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main>
+            <!-- 标签页导航 -->
+            <div class="flex mb-6 bg-white/70 backdrop-blur-sm rounded-xl overflow-hidden shadow-md">
+                <div class="tab-btn active flex-1 text-center py-4 cursor-pointer font-medium text-primary border-b-4 border-primary">今日打卡</div>
+                <div class="tab-btn flex-1 text-center py-4 cursor-pointer font-medium text-text/60 hover:text-primary">历史记录</div>
+            </div>
+
+            <!-- 总体进度 -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-xl p-6 mb-6 shadow-md">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-semibold">今日完成度</span>
+                    <span id="overall-progress-display" class="font-bold text-primary">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                    <div id="overall-progress-bar" class="bg-gradient-to-r from-primary to-secondary h-full w-0 progress-animation rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- 分类任务卡片 -->
+            <div class="main-content grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- 作业卡片 -->
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover shadow-shadow">
+                    <div class="bg-gradient-to-r from-primary/90 to-secondary/90 text-white p-4">
+                        <div class="flex items-center">
+                            <div class="bg-white/20 rounded-lg p-3 mr-3">
+                                <i class="fa fa-book text-xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold">作业</h2>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <ul class="space-y-3">
+                            <li class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-primary rounded-md flex items-center justify-center cursor-pointer" data-category="homework"></div>
+                                    <span>语文</span>
+                                </div>
+                                <span class="text-xs text-primary/70">1小时</span>
+                            </li>
+                            <li class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-primary rounded-md flex items-center justify-center cursor-pointer" data-category="homework"></div>
+                                    <span>英语</span>
+                                </div>
+                                <span class="text-xs text-primary/70">45分钟</span>
+                            </li>
+                            <li class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-primary rounded-md flex items-center justify-center cursor-pointer" data-category="homework"></div>
+                                    <span>数学</span>
+                                </div>
+                                <span class="text-xs text-primary/70">1.5小时</span>
+                            </li>
+                            <li class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-primary rounded-md flex items-center justify-center cursor-pointer" data-category="homework"></div>
+                                    <span>道法</span>
+                                </div>
+                                <span class="text-xs text-primary/70">30分钟</span>
+                            </li>
+                            <li class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-primary rounded-md flex items-center justify-center cursor-pointer" data-category="homework"></div>
+                                    <span>历史</span>
+                                </div>
+                                <span class="text-xs text-primary/70">40分钟</span>
+                            </li>
+                            <li class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-primary rounded-md flex items-center justify-center cursor-pointer" data-category="homework"></div>
+                                    <span>美术</span>
+                                </div>
+                                <span class="text-xs text-primary/70">50分钟</span>
+                            </li>
+                            <li class="flex items-center justify-between p-3 rounded-lg hover:bg-primary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-primary rounded-md flex items-center justify-center cursor-pointer" data-category="homework"></div>
+                                    <span>物理</span>
+                                </div>
+                                <span class="text-xs text-primary/70">1小时</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 强身卡片 -->
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover shadow-shadow">
+                    <div class="bg-gradient-to-r from-[#FF85A2] to-[#FF6B8B] text-white p-4">
+                        <div class="flex items-center">
+                            <div class="bg-white/20 rounded-lg p-3 mr-3">
+                                <i class="fa fa-running text-xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold">强身</h2>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <ul class="space-y-3">
+                            <li class="flex items-center p-3 rounded-lg hover:bg-secondary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-secondary rounded-md flex items-center justify-center cursor-pointer" data-category="fitness"></div>
+                                    <span>体育打卡</span>
+                                </div>
+                            </li>
+                            <li class="p-3 rounded-lg hover:bg-secondary/5 transition-all">
+                                <div class="flex gap-3">
+                                    <div class="flex-1">
+                                        <label class="block text-sm text-gray-500 mb-1">起床时间</label>
+                                        <input type="time" id="wakeup-time" class="w-full p-2 border border-secondary/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary/50">
+                                    </div>
+                                    <div class="flex-1">
+                                        <label class="block text-sm text-gray-500 mb-1">关灯时间</label>
+                                        <input type="time" id="lights-off" class="w-full p-2 border border-secondary/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary/50">
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="flex items-center p-3 rounded-lg hover:bg-secondary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-secondary rounded-md flex items-center justify-center cursor-pointer" data-category="fitness"></div>
+                                    <span>羽毛球</span>
+                                </div>
+                                <span class="text-xs text-secondary/70">1小时</span>
+                            </li>
+                            <li class="flex items-center p-3 rounded-lg hover:bg-secondary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-secondary rounded-md flex items-center justify-center cursor-pointer" data-category="fitness"></div>
+                                    <span>游泳</span>
+                                </div>
+                                <span class="text-xs text-secondary/70">45分钟</span>
+                            </li>
+                            <li class="flex items-center p-3 rounded-lg hover:bg-secondary/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-secondary rounded-md flex items-center justify-center cursor-pointer" data-category="fitness"></div>
+                                    <span>爬山</span>
+                                </div>
+                                <span class="text-xs text-secondary/70">2小时</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 赋能卡片 -->
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover shadow-shadow">
+                    <div class="bg-gradient-to-r from-[#FFD166] to-[#FFBC52] text-white p-4">
+                        <div class="flex items-center">
+                            <div class="bg-white/20 rounded-lg p-3 mr-3">
+                                <i class="fa fa-brain text-xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold">赋能</h2>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <ul class="space-y-3">
+                            <li class="p-3 rounded-lg hover:bg-accent/5 transition-all">
+                                <label class="block text-sm text-gray-500 mb-1">洋葱APP课程</label>
+                                <div class="flex gap-3">
+                                    <div class="flex-2">
+                                        <input type="text" id="onion-course" placeholder="课程名称" class="w-full p-2 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/50">
+                                    </div>
+                                    <div class="flex-1">
+                                        <input type="number" id="onion-duration" placeholder="分钟" class="w-full p-2 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/50">
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="flex items-center p-3 rounded-lg hover:bg-accent/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-accent rounded-md flex items-center justify-center cursor-pointer" data-category="empower"></div>
+                                    <span>阅读书籍</span>
+                                </div>
+                                <span class="text-xs text-accent/70">30分钟</span>
+                            </li>
+                            <li class="flex items-center p-3 rounded-lg hover:bg-accent/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-accent rounded-md flex items-center justify-center cursor-pointer" data-category="empower"></div>
+                                    <span>与家人沟通</span>
+                                </div>
+                                <span class="text-xs text-accent/70">15分钟</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 自立卡片 -->
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover shadow-shadow">
+                    <div class="bg-gradient-to-r from-[#96D178] to-[#7BC950] text-white p-4">
+                        <div class="flex items-center">
+                            <div class="bg-white/20 rounded-lg p-3 mr-3">
+                                <i class="fa fa-hands-helping text-xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold">自立</h2>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <ul class="space-y-3">
+                            <li class="flex items-center p-3 rounded-lg hover:bg-success/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-success rounded-md flex items-center justify-center cursor-pointer" data-category="independence"></div>
+                                    <span>洗衣服</span>
+                                </div>
+                            </li>
+                            <li class="flex items-center p-3 rounded-lg hover:bg-success/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-success rounded-md flex items-center justify-center cursor-pointer" data-category="independence"></div>
+                                    <span>做饭</span>
+                                </div>
+                            </li>
+                            <li class="flex items-center p-3 rounded-lg hover:bg-success/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-success rounded-md flex items-center justify-center cursor-pointer" data-category="independence"></div>
+                                    <span>清洁卫生</span>
+                                </div>
+                            </li>
+                            <li class="flex items-center p-3 rounded-lg hover:bg-success/5 transition-all">
+                                <div class="flex items-center">
+                                    <div class="task-checkbox mr-3 w-6 h-6 border-2 border-success rounded-md flex items-center justify-center cursor-pointer" data-category="independence"></div>
+                                    <span>买菜</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 娱乐时间和进度统计 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-2xl shadow-md p-6 text-center card-hover shadow-shadow md:col-span-1">
+                    <h3 class="text-gray-500 mb-2">次日可分配</h3>
+                    <div class="text-4xl font-bold text-secondary mb-1" id="entertainment-time">4.0</div>
+                    <p class="text-sm text-gray-500">娱乐时间(小时)</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-md p-6 card-hover shadow-shadow md:col-span-2">
+                    <h3 class="text-lg font-semibold mb-4">完成进度</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>作业完成度</span>
+                                <span id="homework-progress-display" class="font-medium">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                                <div id="homework-progress-bar" class="bg-primary h-full w-0 progress-animation rounded-full"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>强身完成度</span>
+                                <span id="fitness-progress-display" class="font-medium">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                                <div id="fitness-progress-bar" class="bg-secondary h-full w-0 progress-animation rounded-full"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>赋能完成度</span>
+                                <span id="empower-progress-display" class="font-medium">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                                <div id="empower-progress-bar" class="bg-accent h-full w-0 progress-animation rounded-full"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>自立完成度</span>
+                                <span id="independence-progress-display" class="font-medium">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                                <div id="independence-progress-bar" class="bg-success h-full w-0 progress-animation rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图表区域 -->
+            <div class="bg-white rounded-2xl shadow-md p-6 mb-8 card-hover shadow-shadow">
+                <h3 class="text-lg font-semibold mb-4">任务完成情况</h3>
+                <div class="h-64">
+                    <canvas id="progress-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- 备注区域 -->
+            <div class="bg-white rounded-2xl shadow-md p-6 mb-8 card-hover shadow-shadow">
+                <div class="flex items-center mb-4">
+                    <i class="fa fa-edit text-primary mr-2"></i>
+                    <h3 class="text-lg font-semibold">今日备注</h3>
+                </div>
+                <textarea id="remark" placeholder="记录今天的感受或重要事项..." class="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none min-h-[120px] transition-all"></textarea>
+            </div>
+
+            <!-- 按钮区域 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <button id="save-btn" class="bg-gradient-to-r from-primary to-secondary text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg shadow-primary/20 btn-animation flex items-center justify-center">
+                    <i class="fa fa-save mr-2"></i> 保存今日记录
+                </button>
+                <button id="history-btn" class="bg-white text-primary border-2 border-primary py-4 px-6 rounded-xl font-bold text-lg shadow-md hover:bg-primary/5 btn-animation flex items-center justify-center">
+                    <i class="fa fa-history mr-2"></i> 查看历史记录
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 初始化日期和倒计时
+        function initDates() {
+            const today = new Date('2025-07-20'); // 根据需求设置的当前日期
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('current-date').textContent = today.toLocaleDateString('zh-CN', options);
+            
+            // 计算假期剩余天数（到2025-09-01）
+            const vacation = new Date('2025-09-01');
+            const vacationDays = Math.ceil((vacation - today) / (1000 * 60 * 60 * 24));
+            document.getElementById('vacation-days').textContent = vacationDays;
+            
+            // 计算中考倒计时（到2027-06-30）
+            const exam = new Date('2027-06-30');
+            const examDays = Math.ceil((exam - today) / (1000 * 60 * 60 * 24));
+            document.getElementById('exam-days').textContent = examDays;
+        }
+        
+        // 初始化任务进度
+        function initProgress() {
+            // 模拟完成情况
+            const completedTasks = {
+                'homework': ['语文', '数学'],
+                'fitness': ['体育打卡'],
+                'empower': ['与家人沟通'],
+                'independence': ['洗衣服', '清洁卫生']
+            };
+            
+            // 设置已完成的复选框
+            for (const category in completedTasks) {
+                completedTasks[category].forEach(task => {
+                    const checkboxes = document.querySelectorAll(`.task-checkbox[data-category="${category}"]`);
+                    checkboxes.forEach(checkbox => {
+                        const taskName = checkbox.parentElement.querySelector('span')?.textContent;
+                        if (taskName === task) {
+                            checkbox.classList.add('checked');
+                            checkbox.innerHTML = '<i class="fa fa-check text-white text-xs"></i>';
+                        }
+                    });
+                });
+            }
+            
+            // 特殊处理：作息计划
+            document.getElementById('wakeup-time').value = '07:30';
+            document.getElementById('lights-off').value = '22:30';
+            
+            // 特殊处理：洋葱APP
+            document.getElementById('onion-course').value = '数学';
+            document.getElementById('onion-duration').value = '60';
+            
+            // 更新进度
+            updateProgress();
+        }
+        
+        // 更新进度条和娱乐时间
+        function updateProgress() {
+            const categories = ['homework', 'fitness', 'empower', 'independence'];
+            const categoryTasks = {
+                'homework': 7,
+                'fitness': 4, // 包括作息计划
+                'empower': 3, // 包括洋葱APP
+                'independence': 4
+            };
+            
+            const completedCount = {
+                'homework': document.querySelectorAll('.task-checkbox[data-category="homework"].checked').length,
+                'fitness': document.querySelectorAll('.task-checkbox[data-category="fitness"].checked').length,
+                'empower': document.querySelectorAll('.task-checkbox[data-category="empower"].checked').length,
+                'independence': document.querySelectorAll('.task-checkbox[data-category="independence"].checked').length
+            };
+            
+            // 特殊处理：作息计划
+            const wakeupTime = document.getElementById('wakeup-time').value;
+            const lightsOff = document.getElementById('lights-off').value;
+            if (wakeupTime && lightsOff) {
+                completedCount.fitness += 1;
+            }
+            
+            // 特殊处理：洋葱APP
+            const onionCourse = document.getElementById('onion-course').value;
+            const onionDuration = document.getElementById('onion-duration').value;
+            if (onionCourse && onionDuration) {
+                completedCount.empower += 1;
+            }
+            
+            // 计算每个类别的完成百分比
+            let totalProgress = 0;
+            let entertainmentTime = 0;
+            
+            categories.forEach(category => {
+                const progress = Math.min(100, Math.round((completedCount[category] / categoryTasks[category]) * 100));
+                totalProgress += progress;
+                
+                // 更新进度条和百分比显示
+                document.getElementById(`${category}-progress-display`).textContent = `${progress}%`;
+                document.getElementById(`${category}-progress-bar`).style.width = `${progress}%`;
+                
+                // 计算娱乐时间贡献（每类最多贡献1小时）
+                entertainmentTime += progress / 100;
+            });
+            
+            // 计算整体进度（平均）
+            const overallProgress = Math.round(totalProgress / categories.length);
+            document.getElementById('overall-progress-display').textContent = `${overallProgress}%`;
+            document.getElementById('overall-progress-bar').style.width = `${overallProgress}%`;
+            
+            // 更新娱乐时间（保留1位小数）
+            document.getElementById('entertainment-time').textContent = entertainmentTime.toFixed(1);
+            
+            // 更新图表
+            updateChart(completedCount, categoryTasks);
+        }
+        
+        // 更新进度图表
+        function updateChart(completed, total) {
+            const ctx = document.getElementById('progress-chart').getContext('2d');
+            
+            // 如果已存在图表实例，销毁它
+            if (window.progressChart) {
+                window.progressChart.destroy();
+            }
+            
+            // 定义颜色
+            const colors = [
+                'rgba(255, 158, 88, 0.7)',
+                'rgba(255, 107, 139, 0.7)',
+                'rgba(255, 209, 102, 0.7)',
+                'rgba(123, 201, 80, 0.7)'
+            ];
+            
+            window.progressChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['作业', '强身', '赋能', '自立'],
+                    datasets: [{
+                        label: '已完成任务',
+                        data: [
+                            completed.homework,
+                            completed.fitness,
+                            completed.empower,
+                            completed.independence
+                        ],
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color.replace('0.7', '1')),
+                        borderWidth: 1
+                    }, {
+                        label: '总任务数',
+                        data: [
+                            total.homework,
+                            total.fitness,
+                            total.empower,
+                            total.independence
+                        ],
+                        backgroundColor: 'rgba(200, 200, 200, 0.2)',
+                        borderColor: 'rgba(150, 150, 150, 0.8)',
+                        borderWidth: 1,
+                        type: 'bar'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            title: {
+                                display: true,
+                                text: '任务数量'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '各类别任务完成情况',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 事件监听
+        function setupEventListeners() {
+            // 任务复选框点击事件
+            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('click', function() {
+                    this.classList.toggle('checked');
+                    if (this.classList.contains('checked')) {
+                        this.innerHTML = '<i class="fa fa-check text-white text-xs"></i>';
+                    } else {
+                        this.innerHTML = '';
+                    }
+                    updateProgress();
+                });
+            });
+            
+            // 输入框变化时更新进度
+            document.getElementById('wakeup-time').addEventListener('change', updateProgress);
+            document.getElementById('lights-off').addEventListener('change', updateProgress);
+            document.getElementById('onion-course').addEventListener('input', updateProgress);
+            document.getElementById('onion-duration').addEventListener('input', updateProgress);
+            
+            // 保存按钮事件
+            document.getElementById('save-btn').addEventListener('click', function() {
+                // 显示保存动画
+                this.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 保存中...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    // 模拟保存成功
+                    this.innerHTML = '<i class="fa fa-check mr-2"></i> 保存成功!';
+                    this.classList.remove('from-primary', 'to-secondary');
+                    this.classList.add('from-success', 'to-success');
+                    
+                    // 保存到本地存储
+                    const saveData = {
+                        date: new Date().toISOString(),
+                        progress: document.getElementById('overall-progress-display').textContent,
+                        entertainmentTime: document.getElementById('entertainment-time').textContent,
+                        remark: document.getElementById('remark').value,
+                        tasks: Array.from(document.querySelectorAll('.task-checkbox')).map(checkbox => ({
+                            name: checkbox.parentElement.querySelector('span')?.textContent || '',
+                            category: checkbox.getAttribute('data-category'),
+                            completed: checkbox.classList.contains('checked')
+                        }))
+                    };
+                    
+                    localStorage.setItem('growth-card-data', JSON.stringify(saveData));
+                    
+                    // 3秒后恢复按钮状态
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fa fa-save mr-2"></i> 保存今日记录';
+                        this.disabled = false;
+                        this.classList.remove('from-success', 'to-success');
+                        this.classList.add('from-primary', 'to-secondary');
+                    }, 3000);
+                }, 1500);
+            });
+            
+            // 历史记录按钮事件
+            document.getElementById('history-btn').addEventListener('click', function() {
+                // 从本地存储获取历史数据
+                const savedData = localStorage.getItem('growth-card-data');
+                
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    alert(`上次保存时间: ${new Date(data.date).toLocaleDateString()}\n完成度: ${data.progress}\n娱乐时间: ${data.entertainmentTime}小时`);
+                } else {
+                    alert('暂无历史记录');
+                }
+            });
+            
+            // 标签页切换
+            document.querySelectorAll('.tab-btn').forEach((tab, index) => {
+                tab.addEventListener('click', () => {
+                    // 移除所有标签页的激活状态
+                    document.querySelectorAll('.tab-btn').forEach(t => {
+                        t.classList.remove('active', 'text-primary', 'border-b-4', 'border-primary');
+                        t.classList.add('text-text/60');
+                    });
+                    
+                    // 添加当前标签页的激活状态
+                    tab.classList.add('active', 'text-primary', 'border-b-4', 'border-primary');
+                    tab.classList.remove('text-text/60');
+                    
+                    // 切换内容（这里只是示例，实际项目中可能需要显示不同的内容）
+                    if (index === 0) {
+                        // 今日打卡
+                        document.querySelector('.main-content').style.display = 'grid';
+                        // 这里可以添加更多内容切换逻辑
+                    } else {
+                        // 历史记录
+                        document.querySelector('.main-content').style.display = 'none';
+                        // 这里可以添加更多内容切换逻辑
+                    }
+                });
+            });
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initDates();
+            initProgress();
+            setupEventListeners();
+            
+            // 从本地存储加载备注
+            const savedRemark = localStorage.getItem('growth-card-remark');
+            if (savedRemark) {
+                document.getElementById('remark').value = savedRemark;
+            }
+            
+            // 监听备注输入，实时保存
+            document.getElementById('remark').addEventListener('input', function() {
+                localStorage.setItem('growth-card-remark', this.value);
+            });
+        });
+    </script>
+</body>
+</html>
